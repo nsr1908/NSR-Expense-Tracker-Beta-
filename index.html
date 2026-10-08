@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>My Expense Tracker</title>
+<meta name="theme-color" content="#0f766e">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f766e'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' fill='white'%3E%E0%A7%B3%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top"><h1>My Expense Tracker</h1><button id="themeBtn" class="icon-btn" aria-label="Toggle theme">🌙</button></header>
+
+<main>
+<!-- HOME -->
+<section id="home" class="view active" aria-label="Home">
+  <div class="grid">
+    <div class="card hero"><span>Current Balance</span><strong id="sBal"></strong></div>
+    <div class="card"><span>Total Income</span><strong id="sInc" class="pos"></strong></div>
+    <div class="card"><span>Total Expense</span><strong id="sExp" class="neg"></strong></div>
+    <div class="card wide"><span>This Month's Expense</span><strong id="sMonth"></strong></div>
+  </div>
+  <div class="card" id="budgetCard">
+    <div class="row"><b>Monthly Budget</b><span id="bStatus" class="pill"></span></div>
+    <div class="bar"><i id="bBar"></i></div>
+    <div class="row small"><span>Budget: <b id="bTotal"></b></span><span>Spent: <b id="bSpent"></b></span><span>Left: <b id="bLeft"></b></span></div>
+  </div>
+  <h2>Recent</h2><div id="recent" class="list"></div>
+</section>
+
+<!-- TRANSACTIONS -->
+<section id="transactions" class="view" aria-label="Transactions">
+  <input id="q" type="search" placeholder="Search category, remarks, payment…" aria-label="Search">
+  <div class="chips" id="typeChips" role="group" aria-label="Type">
+    <button data-t="all" class="on">All</button><button data-t="income">Income</button><button data-t="expense">Expense</button>
+  </div>
+  <div class="two">
+    <select id="fDate" aria-label="Date filter"><option value="all">All dates</option><option value="today">Today</option><option value="week">This Week</option><option value="month">This Month</option><option value="custom">Custom range</option></select>
+    <select id="fCat" aria-label="Category filter"></select>
+  </div>
+  <div class="two hidden" id="customRange"><input type="date" id="dFrom" aria-label="From"><input type="date" id="dTo" aria-label="To"></div>
+  <div id="txList" class="list"></div>
+</section>
+
+<!-- ANALYSIS -->
+<section id="analysis" class="view" aria-label="Analysis">
+  <div class="monthnav"><button id="mPrev" class="icon-btn" aria-label="Previous month">‹</button><b id="mLabel"></b><button id="mNext" class="icon-btn" aria-label="Next month">›</button></div>
+  <div class="card"><h2>Monthly Summary</h2>
+    <dl class="stats"><div><dt>Total Income</dt><dd id="mInc"></dd></div><div><dt>Total Expense</dt><dd id="mExp"></dd></div><div><dt>Savings</dt><dd id="mSav"></dd></div><div><dt>Transactions</dt><dd id="mCnt"></dd></div><div class="full"><dt>Highest Expense Category</dt><dd id="mTop"></dd></div></dl>
+  </div>
+  <div class="card"><h2>Where Did My Money Go?</h2>
+    <div class="chartbox"><canvas id="chart" aria-label="Expense breakdown chart" role="img"></canvas></div>
+    <p id="chartMsg" class="muted center"></p>
+    <div id="catList"></div>
+  </div>
+</section>
+
+<!-- SETTINGS -->
+<section id="settings" class="view" aria-label="Settings">
+  <div class="card"><h2>Preferences</h2>
+    <div class="row"><span>Currency</span><b>Bangladeshi Taka (৳)</b></div>
+    <label for="budgetIn">Monthly Budget (৳) — leave empty for none</label>
+    <div class="two"><input id="budgetIn" type="number" min="0" step="1" inputmode="numeric" placeholder="e.g. 30000"><button id="budgetSave" class="btn">Save budget</button></div>
+    <div class="row"><span>Appearance</span><button id="themeBtn2" class="btn ghost">Switch theme</button></div>
+  </div>
+  <div class="card"><h2>Data Management</h2>
+    <div class="btns"><button id="expCsv" class="btn ghost">Export CSV</button><button id="expJson" class="btn ghost">Export JSON</button><button id="impBtn" class="btn ghost">Import JSON</button><input id="impFile" type="file" accept="application/json,.json" hidden></div>
+    <div class="btns"><button id="demoAdd" class="btn ghost">Add demo data</button><button id="demoDel" class="btn ghost">Remove demo data</button></div>
+    <button id="clearAll" class="btn danger full">Clear all data</button>
+  </div>
+  <div class="card"><h2>About</h2><p><b>My Expense Tracker</b></p><p class="muted">Simple, private and offline personal expense management.</p><p class="muted">Your financial data is stored locally on this device.</p></div>
+</section>
+</main>
+
+<button id="fab" class="fab" aria-label="Add transaction">+ Add Transaction</button>
+
+<nav class="nav" aria-label="Main">
+  <button data-v="home" class="on"><span>🏠</span>Home</button>
+  <button data-v="transactions"><span>📋</span>Transactions</button>
+  <button data-v="analysis"><span>📊</span>Analysis</button>
+  <button data-v="settings"><span>⚙️</span>Settings</button>
+</nav>
+
+<!-- TRANSACTION MODAL -->
+<dialog id="txDlg" aria-labelledby="dlgTitle">
+  <form id="txForm" novalidate>
+    <h2 id="dlgTitle">Add Transaction</h2>
+    <div class="seg" role="group" aria-label="Type"><button type="button" data-ty="expense" class="on">Expense</button><button type="button" data-ty="income">Income</button></div>
+    <label for="fAmt">Amount (৳)</label><input id="fAmt" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0">
+    <label for="fCategory">Category</label><select id="fCategory"></select>
+    <label for="fDateIn">Date</label><input id="fDateIn" type="date">
+    <label for="fPay">Payment Method</label><select id="fPay"></select>
+    <label for="fRem" id="remLbl">Remarks (optional)</label><textarea id="fRem" rows="2" maxlength="200" placeholder="Add a note"></textarea>
+    <p id="formErr" class="err" role="alert"></p>
+    <div class="btns"><button type="button" id="txCancel" class="btn ghost">Cancel</button><button type="submit" class="btn">Save Transaction</button></div>
+  </form>
+</dialog>
+
+<!-- CONFIRM -->
+<dialog id="cfDlg"><form method="dialog"><h2 id="cfTitle"></h2><p id="cfMsg" class="muted"></p>
+<div id="cfExtra" class="hidden"><label for="cfType">Type DELETE to confirm</label><input id="cfType" autocomplete="off"></div>
+<div class="btns"><button value="no" class="btn ghost">Cancel</button><button value="yes" id="cfOk" class="btn danger">Confirm</button></div></form></dialog>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
+<script src="script.js" defer></script>
+</body>
+</html>

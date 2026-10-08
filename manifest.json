@@ -1,0 +1,14 @@
+{
+  "name": "My Expense Tracker",
+  "short_name": "Expenses",
+  "description": "Simple, private and offline personal expense management.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f6f4",
+  "theme_color": "#0f766e",
+  "icons": [
+    { "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%230f766e'/%3E%3Ctext x='256' y='350' font-size='280' text-anchor='middle' fill='white' font-family='sans-serif'%3E%E0%A7%B3%3C/text%3E%3C/svg%3E", "sizes": "512x512", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
